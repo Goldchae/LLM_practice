@@ -10,8 +10,10 @@ def test_stream():
         messages=[{"role": "user", "content": "I want to know how hamsters exercise."}],
         stream=True,
     )
+    print(stream) # 엇..이건 포인터 값이 나오는 듯 <openai.Stream object at 0x7fbeb2689ac0>
+    print(type(stream)) # <class 'openai.Stream'> 흠...
     for part in stream:
-        print(part.choices[0].delta.content or "")
+        print(part.choices[0].delta.content)
 
 test_stream()
 
