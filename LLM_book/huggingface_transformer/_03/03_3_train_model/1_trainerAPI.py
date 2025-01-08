@@ -1,3 +1,6 @@
+from _0_data import train_dataset, test_dataset, valid_dataset
+
+
 # 예제 3.21. Trainer를 사용한 학습: (1) 준비
 import torch
 import numpy as np
@@ -56,3 +59,6 @@ trainer = Trainer(
 trainer.train()
 
 trainer.evaluate(test_dataset) # 정확도 0.84
+
+
+
