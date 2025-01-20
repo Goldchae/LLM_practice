@@ -6,9 +6,61 @@ import wandb
 wandb.login()
 wandb.init(project="trace-example")
 
+"""
 
+💴 데이터 로깅
+사용자의 입력과 LLM 생성 출력을 기록하는 데이터 로깅
 
+ 
 
+동일한 입력에 대해서도 LLM의 응답이 매번 달라지기 때문에 
+
+기록 필요 
+
+ 
+
+ 
+
+🗒️ 대표적인 로깅 도구🗒️
+
+- W&B
+
+ 
+Weights & Biases: The AI Developer Platform
+
+Weights & Biases는 모델을 학습 및 파인튜닝하고, 실험부터 생산까지 모델을 관리하며, LLM으로 구동되는 GenAI 애플리케이션을 추적 및 평가할 수 있는 선도적인 AI 개발자 플랫폼입니다.
+
+site.wandb.ai
+- MLflow
+
+ 
+MLflow | MLflow
+
+Description will go into a meta tag in <head />
+
+mlflow.org
+- PromptLayer
+
+ 
+PromptLayer - The cleanest way to prompt engineer. Platform for prompt management, prompt evaluations, and LLM observability
+
+Best practices Prompt Management and collaboration using a CMS Mar 7, 2024
+
+www.promptlayer.com
+ 
+
+ 
+
+ 
+
+🗒️ 로깅 도구 W&B 써보기
+
+LLM 입력, 출력, 시간, 에러 유무, 등 알 수 있음 
+
+https://wandb.ai/authorize
+
+api 키 찾기
+"""
 
 
 
@@ -19,7 +71,9 @@ import datetime
 from openai import OpenAI
 from wandb.sdk.data_types.trace_tree import Trace
 
-client = OpenAI()
+api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=api_key)
+
 system_message = "You are a helpful assistant."
 query = "대한민국의 수도는 어디야?"
 temperature = 0.2
@@ -43,7 +97,17 @@ root_span = Trace(
       )
 
 root_span.log(name="openai_trace")
+'''
+Trace 클래스 : 
 
+openAI 요청의 입력과 생성 결과, 생성 성공 여부, 생성에 사용한 설정값 등을 이용해 기록할 데이터 생성
+
+ 
+
+Trace 클래스의 log 메서드 :
+
+로그를 W&B에 저장 (각 요청 구분을 위한 이름 설정도 가능)
+'''
 
 
 
@@ -77,3 +141,8 @@ query_engine = index.as_query_engine(similarity_top_k=1, verbose=True)
 response = query_engine.query(
     dataset[0]['question']
 )
+'''
+set_global_handler 함수 :
+
+라마인덱스 내부에서 W&B에 로그를 전송하도록 설정
+'''

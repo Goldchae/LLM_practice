@@ -10,6 +10,58 @@ openai_client = OpenAI(api_key = api_key)
 chroma_client = chromadb.Client()
 
 
+"""
+💴 LLM 캐시
+LLM 생성(추론) => 많은 시간과 비용
+
+가능하면 최대한 줄여야 함
+
+ 
+
+요청과 생성 결과를 기록하고 이후에 동일하거나 비슷한 요청이 들어오면 새롭게 텍스트를 생성하지 않고 이전의 생성 결과를 가져와 응답함으로써 LLM 응답 시간을 줄임 
+
+ 
+
+ 
+
+벡터 데이터베이스를 이용해서 LLM 캐시 직접 구현해 보기
+
+💶 LLM 캐시 작동 원리
+캐시 요청을 통해 기존에 동일하거나 유사한 요청이 있었는지 확인하고 만약 있었다면 LLM 캐시에 저장된 답변을 모델에 전달
+
+ 
+
+💵 일치 캐시 (Exact match)
+
+문자열이 완전히 동일한 응답에 대한 캐시 사용
+
+딕셔너리 형식 자료구조에서 키가 동일한 프롬프트를 찾아 값을 반환
+
+ 
+
+💵 유사 검색 캐시 (Similar search)
+
+문자열이 유사한 응답에 대한 캐시 사용
+
+ 
+
+요청을 임베딩 모델을 이용해 임베딩 벡터로 변환,
+
+벡터 데이터베이스에 유사한 요청이 있는지 검색,
+
+유사한 벡터가 있다면 반환,
+
+없다면 LLM 요청 생성하고 벡터 DB에 새롭게 저장
+
+🥞 실습 : OpenAi api cache 구현
+Chroma : 오픈 소스 벡터 데이터베이스
+
+ 
+
+time.time()
+소요 시간 체크하기
+"""
+
 
 
 
@@ -122,7 +174,23 @@ class OpenAICache:
                 self.cache[prompt] = response_text(response)
                 self.semantic_cache.add(documents=[prompt], metadatas=[{"response":response_text(response)}], ids=[prompt])
         return self.cache[prompt]
-    
+"""
+semantic_cache : 벡터 데이터베이스 클라이언트
+
+ 
+
+1. 일치 캐시 있는지 확인/반환
+
+2. 없으면 크로마 벡터 데이터베이스의 query 메서드에 query_texts 입력 (벡터 데이터베이스에 등록된 임베딩 모델을 사용해 텍스트를 임베딩 벡터로 전환 / 검색 수행 )
+
+3. 검색 결과가 존재?/ 검색 결과와 검색 데이터 사이의 거리가 가까운지?(유사도) 체크/반환
+
+4. 다 없으면 LLM에 새로 요청 , 일치 캐시와 유사 검색 캐시에 저장
+
+ 
+
+chromaDB의 OpenAIEmbedding Fuction 클래스에 api 키와 임베딩 모델 이름 입력.
+"""
 
 
 
